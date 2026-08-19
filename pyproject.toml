@@ -3,5 +3,5 @@ name = "odyssey"
 version = "0.1.0"
 description = "A model training framework inspired by Pytorch Lightning"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = ["torch"]
