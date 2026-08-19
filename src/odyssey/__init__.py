@@ -1,5 +1,6 @@
 from .compute.accelerate import AcceleratedCompute
 from .compute.core import Compute
+from .compute.ddp import DistributedDataParallelCompute
 from .defaults import DefaultIteration, Result
 from .glue import (
     BatchTelemetry,
@@ -19,6 +20,7 @@ __all__ = [
     "Compute",
     "ComputeHandle",
     "DefaultIteration",
+    "DistributedDataParallelCompute",
     "EpochTelemetry",
     "Iteration",
     "Objective",
