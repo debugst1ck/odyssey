@@ -1,23 +1,22 @@
 # Odyssey
 
-Odyssey is a training library for PyTorch modules. It provides a set of tools and utilities to facilitate the training and evaluation of deep learning models, making it easier for researchers and practitioners to experiment with different architectures and training strategies.
+Odyssey is a modern, lightweight, type-safe training orchestrator for PyTorch, built from the ground up using advanced Python type hinting (PEP 646 Type Parameter Syntax / Type Var Tuples). It provides a clean separation of concerns between compute hardware management, objectives, training phases, and telemetry/plugins, making complex setups like multi-model loops (e.g., GANs) and gradient accumulation seamless.
 
-## Why not PyTorch Lightning?
+## Features
 
-While PyTorch Lightning is a popular choice for simplifying the training loop and providing a high-level interface for PyTorch, Odyssey aims to offer a more flexible and lightweight alternative.
+- Type-Safe Generic Architecture: Leverages Python's modern typing capabilities (`*ModelsTs`) to ensure type safety across models, batches, and objectives.
+- Flexible Gradient Accumulation: Supports two accumulation modes:
+- `"stream"`: Processes batches sequentially to conserve CPU/RAM.
+- `"block"`: Pre-loads chunks into memory for better mathematical accuracy in multi-model series training (e.g., GANs).
 
-## Design Principles
+- Decoupled Plugins & Telemetry: Easily hook into lifecycle events (`on_epoch_begin`, `on_batch_begin`, `on_batch_end`, `on_optimizer_step`, `on_epoch_end`) for logging, checkpointing, or metrics tracking.
+- Phase & Iteration Abstraction: Distinctly separates optimization phases, training steps, and forward-pass logic from the core orchestrator loop.
+- Distributed & Mixed Precision Ready: Built-in hooks for gradient clipping, synchronization contexts, and distributed computing bounds.
 
-Odyssey operates on the principle of Inversion of Control (IoC), allowing users to have more control over the training process while still benefiting from a structured framework. It is neatly partitioned to 5 different modules, each with a specific purpose and responsibility:
+## Core Components
 
-- Objectives: This module contains strictly the forward functions of the model, the mathematical operations that define the model's behavior.
-- Iteration: This module contains the training loop, for forward and backward passes.
-- Plugins: This module contains schedulers, progress bars, checkpointing, and many other utilities that can be used to enhance the training process.
-- Compute: This module defines the compute strategy, whether it be single device, distributed data parallel (DDP), or fully sharded data parallel (FSDP2).
-- Orchestration: This module is responsible for orchestrating the training process, coordinating the objectives, stepping optimizers, and managing the overall flow of the training loop.
-
-## Warning to authors, contributers and users
-
-Odyssey is designed to support multiple modules, optimizers and schedulers, but due to how distibuted data parallel works as a wrapper, it assumes we only use the forward function of the module, at the top level, this means you cannot call submodules when calculating the loss. It is because we pass the DDP module rather than the actual nn.Module, and the DDP module only has the forward function.
-
-But if you're using the single device compute or FSDP2, you can use submodules without restrictions.
+1. `Orchestrator`: The central loop runner that handles epochs, batch splitting, mode switching (training/inference), and plugin callbacks.
+2. `Compute`: Protocol defining hardware interactions (device placement, backward passes, gradient zeroing, optimizer steps, and distributed reductions).
+3. `Objective`: Defines the core forward pass logic for your models given a data batch.
+4. `Phase`: Combines an `Iteration` strategy with a specific sequence of `Optimizer`s.
+5. `Plugin`: Lifecycle hooks for extending training behavior without cluttering the main loop.

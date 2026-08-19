@@ -5,7 +5,7 @@ import torch
 from torch import Tensor
 from torch.distributed import ReduceOp
 
-from .iteration import Iteration
+from .iteration import Phase
 
 
 class StopTraining(Exception):
@@ -32,7 +32,7 @@ class EpochTelemetry[*ModelsTs]:
 class BatchTelemetry[*ModelsTs, BatchT, ResultT](EpochTelemetry[*ModelsTs]):
     batch_index: int
     is_accumulation_boundary: bool
-    iteration: Iteration[*ModelsTs, BatchT, ResultT]
+    phase: Phase[*ModelsTs, BatchT, ResultT]
 
 
 @dataclass(frozen=True, slots=True)

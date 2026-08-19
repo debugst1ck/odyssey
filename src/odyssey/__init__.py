@@ -1,3 +1,4 @@
+from .compute.accelerate import AcceleratedCompute
 from .compute.core import Compute
 from .defaults import DefaultIteration, Result
 from .glue import (
@@ -13,6 +14,7 @@ from .orchestration import Orchestrator
 from .plugin import Plugin
 
 __all__ = [
+    "AcceleratedCompute",
     "BatchTelemetry",
     "Compute",
     "ComputeHandle",

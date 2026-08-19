@@ -34,7 +34,7 @@ class Orchestrator[*ModelsTs, BatchT, ResultT]:
         plugins: Sequence[Plugin[*ModelsTs, BatchT, ResultT]] = (),
         accumulation_steps: int = 1,
         clipping: float = 1.0,
-        accumulation_mode: Literal["stream", "chunk"] = "stream",
+        accumulation_mode: Literal["stream", "block"] = "stream",
     ) -> None:
         self.compute = compute
         self.objective = objective
@@ -79,7 +79,7 @@ class Orchestrator[*ModelsTs, BatchT, ResultT]:
                         epoch_telemetry.total_batches,
                         global_index,
                         is_last_batch,
-                        phase.iteration,
+                        phase,
                     )
 
                     for plugin in self.plugins:
@@ -144,7 +144,7 @@ class Orchestrator[*ModelsTs, BatchT, ResultT]:
                     total_batches,
                     batch_index,
                     is_sync_boundary,
-                    phase.iteration,
+                    phase,
                 )
 
                 for plugin in self.plugins:
@@ -205,7 +205,7 @@ class Orchestrator[*ModelsTs, BatchT, ResultT]:
                 match self.accumulation_mode:
                     case "stream":
                         self._stream(dataloader, epoch_telemetry, is_training)
-                    case "chunk":
+                    case "block":
                         self._chunk(dataloader, epoch_telemetry, is_training)
                     case _:
                         raise ValueError(
