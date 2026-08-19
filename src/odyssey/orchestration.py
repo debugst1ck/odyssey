@@ -48,6 +48,7 @@ class Orchestrator[*ModelsTs, BatchT, ResultT]:
             device=self.compute.device,
             is_main_process=self.compute.is_main_process,
             reduce=self.compute.reduce,
+            state_dicts=self.compute.state_dicts,
         )
 
         self._optimizer_step = 0

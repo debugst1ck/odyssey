@@ -157,3 +157,10 @@ class DistributedDataParallelCompute[*ModelsTs](Compute[*ModelsTs]):
         cloned = tensor.clone()
         _ = dist.all_reduce(cloned, op=op)
         return cloned
+
+    @override
+    def state_dicts(self) -> Sequence[dict[str, Tensor]]:
+        return [
+            {k: v.cpu() for k, v in cast(nn.Module, m).state_dict().items()}
+            for m in self._models
+        ]

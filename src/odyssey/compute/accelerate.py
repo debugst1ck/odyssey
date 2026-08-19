@@ -110,3 +110,10 @@ class AcceleratedCompute[*ModelsTs](Compute[*ModelsTs]):
     @override
     def reduce(self, tensor: Tensor, op: ReduceOp.RedOpType = ReduceOp.SUM) -> Tensor:
         return tensor  # No-op for single-process, single-device compute.
+
+    @override
+    def state_dicts(self) -> list[dict[str, Tensor]]:
+        return [
+            {k: v.cpu() for k, v in cast(nn.Module, m).state_dict().items()}
+            for m in self._models
+        ]

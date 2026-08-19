@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 
 import torch
@@ -18,6 +18,7 @@ class ComputeHandle[*ModelsTs]:
     device: torch.device
     is_main_process: bool
     reduce: Callable[[Tensor, ReduceOp.RedOpType], Tensor]
+    state_dicts: Callable[[], Sequence[dict[str, Tensor]]]
 
 
 @dataclass(frozen=True, slots=True)
