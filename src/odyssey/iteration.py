@@ -1,5 +1,6 @@
 from collections.abc import Sequence
-from typing import Protocol, final
+from dataclasses import dataclass
+from typing import Protocol
 
 from torch.optim import Optimizer
 
@@ -23,12 +24,7 @@ class Iteration[*ModelsTs, ObjectiveT, BatchT, ResultT](Protocol):
     ) -> ResultT: ...
 
 
-@final
+@dataclass(frozen=True, slots=True)
 class Phase[*ModelsTs, ObjectiveT, BatchT, ResultT]:
-    def __init__(
-        self,
-        iteration: Iteration[*ModelsTs, ObjectiveT, BatchT, ResultT],
-        optimizers: Sequence[Optimizer],
-    ) -> None:
-        self.iteration = iteration
-        self.optimizers = optimizers
+    iteration: Iteration[*ModelsTs, ObjectiveT, BatchT, ResultT]
+    optimizers: Sequence[Optimizer]
