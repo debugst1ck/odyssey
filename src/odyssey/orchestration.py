@@ -56,7 +56,7 @@ class Orchestrator[*ModelsTs, ObjectiveT, BatchT, ResultT]:
     def _chunk(
         self,
         dataloader: BoundedIterable[BatchT],
-        epoch_telemetry: EpochTelemetry[*ModelsTs],
+        epoch_telemetry: EpochTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT],
         is_training: bool,
     ) -> None:
         """
@@ -77,6 +77,7 @@ class Orchestrator[*ModelsTs, ObjectiveT, BatchT, ResultT]:
                         epoch_telemetry.is_training,
                         epoch_telemetry.epoch_index,
                         epoch_telemetry.total_batches,
+                        epoch_telemetry.phases,
                         global_index,
                         is_last_batch,
                         phase,
@@ -115,7 +116,9 @@ class Orchestrator[*ModelsTs, ObjectiveT, BatchT, ResultT]:
                             epoch_telemetry.is_training,
                             epoch_telemetry.epoch_index,
                             epoch_telemetry.total_batches,
+                            epoch_telemetry.phases,
                             self._optimizer_step,
+                            phase,
                         )
                         for plugin in self.plugins:
                             plugin.on_optimizer_step(step_telemetry)
@@ -123,7 +126,7 @@ class Orchestrator[*ModelsTs, ObjectiveT, BatchT, ResultT]:
     def _stream(
         self,
         dataloader: BoundedIterable[BatchT],
-        epoch_telemetry: EpochTelemetry[*ModelsTs],
+        epoch_telemetry: EpochTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT],
         is_training: bool,
     ) -> None:
         """
@@ -138,12 +141,13 @@ class Orchestrator[*ModelsTs, ObjectiveT, BatchT, ResultT]:
 
             for phase in self.phases:
                 batch_telemetry = BatchTelemetry(
-                    self.handle,
-                    is_training,
-                    self._epoch_index,
-                    total_batches,
+                    epoch_telemetry.handle,
+                    epoch_telemetry.is_training,
+                    epoch_telemetry.epoch_index,
+                    epoch_telemetry.total_batches,
+                    epoch_telemetry.phases,
                     batch_index,
-                    is_sync_boundary,
+                    is_last_batch,
                     phase,
                 )
 
@@ -178,11 +182,13 @@ class Orchestrator[*ModelsTs, ObjectiveT, BatchT, ResultT]:
                     if optimized:
                         self._optimizer_step += 1
                         step_telemetry = StepTelemetry(
-                            self.handle,
-                            is_training,
-                            self._epoch_index,
-                            total_batches,
+                            epoch_telemetry.handle,
+                            epoch_telemetry.is_training,
+                            epoch_telemetry.epoch_index,
+                            epoch_telemetry.total_batches,
+                            epoch_telemetry.phases,
                             self._optimizer_step,
+                            phase,
                         )
                         for plugin in self.plugins:
                             plugin.on_optimizer_step(step_telemetry)
@@ -195,7 +201,7 @@ class Orchestrator[*ModelsTs, ObjectiveT, BatchT, ResultT]:
         self.compute.train(is_training)
 
         epoch_telemetry = EpochTelemetry(
-            self.handle, is_training, self._epoch_index, len(dataloader)
+            self.handle, is_training, self._epoch_index, len(dataloader), self.phases
         )
         for plugin in self.plugins:
             plugin.on_epoch_begin(epoch_telemetry)

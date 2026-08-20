@@ -22,20 +22,26 @@ class ComputeHandle[*ModelsTs]:
 
 
 @dataclass(frozen=True, slots=True)
-class EpochTelemetry[*ModelsTs]:
+class EpochTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT]:
     handle: ComputeHandle[*ModelsTs]
     is_training: bool
     epoch_index: int
     total_batches: int
+    phases: Sequence[Phase[*ModelsTs, ObjectiveT, BatchT, ResultT]]
 
 
 @dataclass(frozen=True, slots=True)
-class BatchTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT](EpochTelemetry[*ModelsTs]):
+class BatchTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT](
+    EpochTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT]
+):
     batch_index: int
     is_accumulation_boundary: bool
     phase: Phase[*ModelsTs, ObjectiveT, BatchT, ResultT]
 
 
 @dataclass(frozen=True, slots=True)
-class StepTelemetry[*ModelsTs](EpochTelemetry[*ModelsTs]):
+class StepTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT](
+    EpochTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT]
+):
     optimizer_step: int
+    phase: Phase[*ModelsTs, ObjectiveT, BatchT, ResultT]
