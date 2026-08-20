@@ -4,13 +4,12 @@ from typing import Protocol
 from torch.optim import Optimizer
 
 from .compute.core import Compute
-from .objective import Objective
 
 
-class Iteration[*ModelsTs, BatchT, ResultT](Protocol):
+class Iteration[*ModelsTs, ObjectiveT, BatchT, ResultT](Protocol):
     def training_step(
         self,
-        objective: Objective[*ModelsTs, BatchT, ResultT],
+        objective: ObjectiveT,
         compute: Compute[*ModelsTs],
         batch: BatchT,
         divisor: float,
@@ -18,12 +17,12 @@ class Iteration[*ModelsTs, BatchT, ResultT](Protocol):
 
     def inference_step(
         self,
-        objective: Objective[*ModelsTs, BatchT, ResultT],
+        objective: ObjectiveT,
         compute: Compute[*ModelsTs],
         batch: BatchT,
     ) -> ResultT: ...
 
 
-class Phase[*ModelsTs, BatchT, ResultT](Protocol):
-    iteration: Iteration[*ModelsTs, BatchT, ResultT]
+class Phase[*ModelsTs, ObjectiveT, BatchT, ResultT](Protocol):
+    iteration: Iteration[*ModelsTs, ObjectiveT, BatchT, ResultT]
     optimizers: Sequence[Optimizer]

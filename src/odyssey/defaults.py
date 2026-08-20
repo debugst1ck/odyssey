@@ -1,9 +1,11 @@
-from typing import Protocol, final
+from typing import Protocol, final, override
 
+import torch
 from torch import Tensor
 
+from odyssey.iteration import Iteration
+
 from .compute.core import Compute
-from .objective import Objective
 
 
 class Result(Protocol):
@@ -11,11 +13,20 @@ class Result(Protocol):
     def loss(self) -> Tensor: ...
 
 
+class DefaultObjective[*ModelsTs, BatchT, ResultT: Result](Protocol):
+    def forward_pass(
+        self, *models: *ModelsTs, batch: BatchT, device: torch.device
+    ) -> ResultT: ...
+
+
 @final
-class DefaultIteration[*ModelsTs, BatchT, ResultT: Result]:
+class DefaultIteration[*ModelsTs, BatchT, ResultT: Result](
+    Iteration[*ModelsTs, DefaultObjective[*ModelsTs, BatchT, ResultT], BatchT, ResultT]
+):
+    @override
     def training_step(
         self,
-        objective: Objective[*ModelsTs, BatchT, ResultT],
+        objective: DefaultObjective[*ModelsTs, BatchT, ResultT],
         compute: Compute[*ModelsTs],
         batch: BatchT,
         divisor: float,
@@ -27,9 +38,10 @@ class DefaultIteration[*ModelsTs, BatchT, ResultT: Result]:
         compute.backward_pass(result.loss / divisor)
         return result
 
+    @override
     def inference_step(
         self,
-        objective: Objective[*ModelsTs, BatchT, ResultT],
+        objective: DefaultObjective[*ModelsTs, BatchT, ResultT],
         compute: Compute[*ModelsTs],
         batch: BatchT,
     ) -> ResultT:

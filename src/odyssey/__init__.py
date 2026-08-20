@@ -1,7 +1,7 @@
 from .compute.accelerate import AcceleratedCompute
 from .compute.core import Compute
 from .compute.ddp import DistributedDataParallelCompute
-from .defaults import DefaultIteration, Result
+from .defaults import DefaultIteration, DefaultObjective, Result
 from .glue import (
     BatchTelemetry,
     ComputeHandle,
@@ -10,7 +10,6 @@ from .glue import (
     StopTraining,
 )
 from .iteration import Iteration, Phase
-from .objective import Objective
 from .orchestration import Orchestrator
 from .plugin import Plugin
 
@@ -20,10 +19,10 @@ __all__ = [
     "Compute",
     "ComputeHandle",
     "DefaultIteration",
+    "DefaultObjective",
     "DistributedDataParallelCompute",
     "EpochTelemetry",
     "Iteration",
-    "Objective",
     "Orchestrator",
     "Phase",
     "Plugin",

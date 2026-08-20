@@ -1,17 +1,19 @@
 from .glue import BatchTelemetry, EpochTelemetry, StepTelemetry
 
 
-class Plugin[*ModelsTs, BatchT, ResultT]:
+class Plugin[*ModelsTs, ObjectiveT, BatchT, ResultT]:
     def on_epoch_begin(self, _telemetry: EpochTelemetry[*ModelsTs]) -> None:
         pass
 
     def on_batch_begin(
-        self, _telemetry: BatchTelemetry[*ModelsTs, BatchT, ResultT]
+        self, _telemetry: BatchTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT]
     ) -> None:
         pass
 
     def on_batch_end(
-        self, _telemetry: BatchTelemetry[*ModelsTs, BatchT, ResultT], _result: ResultT
+        self,
+        _telemetry: BatchTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT],
+        _result: ResultT,
     ) -> None:
         pass
 

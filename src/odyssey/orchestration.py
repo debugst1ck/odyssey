@@ -15,7 +15,6 @@ from .glue import (
     StopTraining,
 )
 from .iteration import Phase
-from .objective import Objective
 from .plugin import Plugin
 
 
@@ -24,14 +23,14 @@ class BoundedIterable[T](Iterable[T], Sized, Protocol):
 
 
 @final
-class Orchestrator[*ModelsTs, BatchT, ResultT]:
+class Orchestrator[*ModelsTs, ObjectiveT, BatchT, ResultT]:
     def __init__(
         self,
         compute: Compute[*ModelsTs],
-        objective: Objective[*ModelsTs, BatchT, ResultT],
-        phases: Sequence[Phase[*ModelsTs, BatchT, ResultT]],
+        objective: ObjectiveT,
+        phases: Sequence[Phase[*ModelsTs, ObjectiveT, BatchT, ResultT]],
         *,
-        plugins: Sequence[Plugin[*ModelsTs, BatchT, ResultT]] = (),
+        plugins: Sequence[Plugin[*ModelsTs, ObjectiveT, BatchT, ResultT]] = (),
         accumulation_steps: int = 1,
         clipping: float = 1.0,
         accumulation_mode: Literal["stream", "block"] = "stream",

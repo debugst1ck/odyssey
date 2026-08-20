@@ -30,10 +30,10 @@ class EpochTelemetry[*ModelsTs]:
 
 
 @dataclass(frozen=True, slots=True)
-class BatchTelemetry[*ModelsTs, BatchT, ResultT](EpochTelemetry[*ModelsTs]):
+class BatchTelemetry[*ModelsTs, ObjectiveT, BatchT, ResultT](EpochTelemetry[*ModelsTs]):
     batch_index: int
     is_accumulation_boundary: bool
-    phase: Phase[*ModelsTs, BatchT, ResultT]
+    phase: Phase[*ModelsTs, ObjectiveT, BatchT, ResultT]
 
 
 @dataclass(frozen=True, slots=True)
